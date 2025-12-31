@@ -34,7 +34,7 @@ const handleGetProduct = async (req, res, next) => {
 
     const filter = {
       $or: [
-        { name: { $regex: searchRegExp } }
+        { title: { $regex: searchRegExp } }
       ],
     };
 
@@ -49,6 +49,7 @@ const handleGetProduct = async (req, res, next) => {
     }
 
     const count = await Product.find(filter).countDocuments();
+
 
     return successResponse(res, {
       statusCode: 200,
