@@ -56,9 +56,9 @@ const productsSchema = new Schema(
       type: Number,
       default: 0,
     },
-    image: {
-      type: String,
-      default: defaultImagePath,
+    images: {
+      type: [String],
+      required: [true, "Product images are required"]
     },
     category: {
       type: Schema.Types.ObjectId,
@@ -66,7 +66,7 @@ const productsSchema = new Schema(
       required: [true, "Product category is required"],
     },
   },
-  { timestamps: true }
+  { timestamps: true},
 );
 
 const Product = model("Product", productsSchema);

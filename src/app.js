@@ -5,7 +5,6 @@ const createError = require('http-errors');
 const { xss } = require("express-xss-sanitizer");
 const rateLimite = require("express-rate-limit");
 const userRouter = require("./routes/userRouter");
-const seedRouter = require("./routes/seedRouter");
 const { errorResponse } = require("./controller/errorController");
 const authRouter = require("./routes/authRouter");
 const cookieParser = require('cookie-parser');
@@ -36,7 +35,6 @@ app.use(xss());
 
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/seed", seedRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/products", productRouter);
 

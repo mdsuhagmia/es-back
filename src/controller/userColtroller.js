@@ -10,7 +10,6 @@ const {
 } = require("../secret");
 const emailWithNodeMailer = require("../helpers/email");
 const jwt = require("jsonwebtoken");
-const deleteImage = require("../helpers/deleteImageHelper");
 const {
   userAction,
   updateUserPasswordById,

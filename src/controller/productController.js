@@ -1,18 +1,15 @@
 const createError = require("http-errors");
 const { successResponse } = require("./errorController");
-const findWithId = require("../services/findItem");
 const Product = require("../modules/productsModules");
-const slugify = require("slugify");
 const { createProduct } = require("../services/productService");
-const deleteImage = require("../helpers/deleteImageHelper");
 const {publicIdWithoutExtensionFromUrl, deleteFileFromCloudinary} = require("../helpers/cloudinaryHelper");
 const cloudinary = require("../config/cloudinary");
 
 const handleCreateProduct = async (req, res, next) => {
   try {
-    const image = req.file?.path;
+    const images = req.files ? req.files.map(file => file.path) : [];
 
-    const product = await createProduct(req.body, image);
+    const product = await createProduct(req.body, images);
 
     return successResponse(res, {
       statusCode: 200,
@@ -87,47 +84,6 @@ const handleGetSingleProduct = async (req, res, next) => {
   }
 };
 
-// const handleUpdateProduct = async (req, res, next) => {
-//   try {
-//     const {slug} = req.params;
-//     const userOptions = { new: true, runValidators: true, context: "query" };
-//     let updates = {};
-
-//     const allowedFields = ["title", "description", "price", "quantity", "sold", "shipping", "category"];
-//     for (let key in req.body) {
-//       if (allowedFields.includes(key)) {
-//         updates[key] = req.body[key];
-//       }
-//     }
-//     const image = req.file?.path;
-//     if (image) {
-//       if (image.size > 1024 * 1024 * 2) {
-//         throw createError(400, "File too large. It must be less than 2 MB");
-//       }
-//       updates.image = image;
-//       Product.image !== "defauld.png" && deleteImage(Product.image);
-//     }
-
-//     const updatedProduct = await Product.findOneAndUpdate(
-//       {slug},
-//       updates,
-//       userOptions
-//     )
-
-//     if (!updatedProduct) {
-//       throw createError(404, "Product with this slug does not exists");
-//     }
-
-//     return successResponse(res, {
-//       statusCode: 200,
-//       message: "Product was updated successfully.",
-//       payload: { updatedProduct }
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 const handleUpdateProduct = async (req, res, next) => {
   try {
     const { slug } = req.params;
@@ -138,7 +94,6 @@ const handleUpdateProduct = async (req, res, next) => {
     }
 
     let updates = {};
-
     const allowedFields = ["title", "description", "price", "quantity", "sold", "shipping", "category"];
 
     for (let key in req.body) {
@@ -147,23 +102,28 @@ const handleUpdateProduct = async (req, res, next) => {
       }
     }
 
-    // if (req.file) {
-    //   updates.image = req.file.path;
+    if (req.files && req.files.length > 0) {
+      const imageUrls = [];
+      
+      for (const file of req.files) {
+        if (file.size > 1024 * 1024 * 2) {
+          throw createError(400, "Each file must be less than 2 MB");
+        }
 
-    //   if (existingProduct.image && existingProduct.image !== "defauld.png") {
-    //     await deleteImage(existingProduct.image);
-    //   }
-    // }
-
-    const image = req.file.path
-    if(image){
-      if (image && image.size > 1024 * 1024 * 2) {
-        throw createError(400, "File too large. It must be less than 2 MB");
+        const response = await cloudinary.uploader.upload(file.path, {
+          folder: "ElectroSelling/products",
+        });
+        imageUrls.push(response.secure_url);
       }
-      const response = await cloudinary.uploader.upload(image, {
-        folder: "ElectroSelling/products",
-      });
-      updates.image = response.secure_url;
+
+      updates.images = imageUrls;
+
+      if (existingProduct.images && existingProduct.images.length > 0) {
+        for (const oldImageUrl of existingProduct.images) {
+          const publicId = await publicIdWithoutExtensionFromUrl(oldImageUrl);
+          await deleteFileFromCloudinary("ElectroSelling/products", publicId, "Product");
+        }
+      }
     }
 
     const updatedProduct = await Product.findOneAndUpdate(
@@ -172,13 +132,8 @@ const handleUpdateProduct = async (req, res, next) => {
       { new: true, runValidators: true, context: "query" }
     );
 
-    if(!updatedProduct){
-      throw createError(409, 'Updating product was not possible.')
-    }
-
-    if(existingProduct.image){
-      const publicId = await publicIdWithoutExtensionFromUrl(existingProduct.image);
-      await deleteFileFromCloudinary("ElectroSelling/products", publicId, "Product")
+    if (!updatedProduct) {
+      throw createError(409, 'Updating product was not possible.');
     }
 
     return successResponse(res, {
@@ -195,24 +150,22 @@ const handleDeleteProduct = async (req, res, next) => {
   try {
     const {slug} = req.params;
 
-    const existtingProduct = await Product.findOne({slug})
-    if(!existtingProduct){
+    const existingProduct = await Product.findOne({slug})
+    if(!existingProduct){
       throw createError(404, 'Product not found');
     }
-    if(existtingProduct.image){
-        const publicId = await publicIdWithoutExtensionFromUrl(existtingProduct.image)
-        deleteFileFromCloudinary("ElectroSelling/products", publicId, "Product")
+    if (existingProduct.images && existingProduct.images.length > 0) {
+      for (const url of existingProduct.images) {
+        const publicId = await publicIdWithoutExtensionFromUrl(url);
+        await deleteFileFromCloudinary(
+          "ElectroSelling/products",
+          publicId,
+          "Product"
+        );
       }
+    }
 
     await Product.findOneAndDelete({slug});
-
-    // if(!product){
-    //   throw createError(404, 'Product not found');
-    // }
-
-    // if (product.image) {
-    //   await deleteImage(product.image);
-    // }
 
     return successResponse(res, {
       statusCode: 200,

@@ -9,7 +9,7 @@ const { uploadProductImage } = require("../middlewares/uploadFile");
 
 productRouter.post(
   "/",
-  uploadProductImage.single("image"),
+  uploadProductImage.array("images", 10),
   validateProduct,
   runValidation,
   isLoggedIn,
@@ -29,7 +29,7 @@ productRouter.get(
 
 productRouter.put(
   "/:slug",
-  uploadProductImage.single("image"),
+  uploadProductImage.array("images", 10),
   isLoggedIn,
   isAdmin,
   handleUpdateProduct

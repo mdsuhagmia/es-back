@@ -1,4 +1,3 @@
-const slugify = require('slugify')
 const createError = require('http-errors');
 const { successResponse } = require("./errorController");
 const { createCategory, getCategories, getSingleCategory, updateCategory, deleteCategory } = require('../services/categoryService');
