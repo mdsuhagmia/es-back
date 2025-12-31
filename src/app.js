@@ -12,12 +12,19 @@ const cookieParser = require('cookie-parser');
 const categoryRouter = require("./routes/categoryRoutes");
 const productRouter = require("./routes/productRoutes");
 const app = express();
+const cors = require('cors');
 
 const rateLimiter = rateLimite({
     windowMs: 1 * 60 * 1000, // one minutes
     max: 20,
     message: "Too many requist from this IP. please try again later"
 });
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
 
 app.use(cookieParser());
 app.use(rateLimiter);
