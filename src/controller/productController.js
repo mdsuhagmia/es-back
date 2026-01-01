@@ -94,7 +94,7 @@ const handleUpdateProduct = async (req, res, next) => {
     }
 
     let updates = {};
-    const allowedFields = ["title", "description", "price", "quantity", "sold", "shipping", "category"];
+    const allowedFields = ["title", "description", "price", "discountPrice", "quantity", "sold", "shipping", "category", "stock", "weight", "brand"];
 
     for (let key in req.body) {
       if (allowedFields.includes(key)) {

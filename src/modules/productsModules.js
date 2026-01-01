@@ -1,5 +1,4 @@
 const { Schema, model } = require("mongoose");
-const { defaultImagePath } = require("../secret");
 
 const productsSchema = new Schema(
   {
@@ -35,6 +34,17 @@ const productsSchema = new Schema(
         message: (props) => `${props.value} is not a valid price`,
       },
     },
+    discountPrice: {
+      type: Number,
+      default: 0,
+      validate: {
+        validator: function (value) {
+          return value <= this.price;
+        },
+        message:
+          "Discount price must be less than or equal to the regular price",
+      },
+    },
     quantity: {
       type: Number,
       required: [true, "Product quantity is required"],
@@ -58,15 +68,32 @@ const productsSchema = new Schema(
     },
     images: {
       type: [String],
-      required: [true, "Product images are required"]
+      required: [true, "Product images are required"],
     },
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
       required: [true, "Product category is required"],
     },
+    stock: {
+      type: Number,
+      required: [true, "Product stock is required"],
+      default: 0,
+      min: [0, "Stock cannot be negative"],
+    },
+    weight: {
+      type: Number,
+      required: [true, "Product weight is required"],
+      min: [0, "Weight cannot be negative"],
+      default: 0,
+    },
+    brand: {
+      type: String,
+      trim: true,
+      required: [true, "Product brand is required"],
+    },
   },
-  { timestamps: true},
+  { timestamps: true }
 );
 
 const Product = model("Product", productsSchema);
