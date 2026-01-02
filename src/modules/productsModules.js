@@ -39,10 +39,12 @@ const productsSchema = new Schema(
       default: 0,
       validate: {
         validator: function (value) {
-          return value <= this.price;
+          const price =
+            this.price || (this.getUpdate ? this.getUpdate().$set.price : null);
+          return value <= (price || Infinity);
         },
         message:
-          "Discount price must be less than or equal to the regular price",
+          "Discount price ({VALUE}) must be less than or equal to the regular price",
       },
     },
     quantity: {
