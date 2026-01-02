@@ -9,5 +9,8 @@ authRouter.post("/login", validateUserLogin, runValidation, isLoggedOut, handleL
 authRouter.post("/logout", isLoggedIn, handleLogout);
 authRouter.get("/refresh-token", handleRefreshToken);
 authRouter.get("/protected", handleProtected);
+authRouter.get("/me", isLoggedIn, (req, res) => {
+  res.status(200).json({ user: req.user });
+});
 
 module.exports = authRouter;
