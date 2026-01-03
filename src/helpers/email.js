@@ -4,7 +4,7 @@ const logger = require("../controller/loggerController");
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
+  port: 587,
   secure: false,
   auth: {
     user: smtpUsername,
