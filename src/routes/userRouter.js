@@ -10,7 +10,7 @@ userRouter.post("/process-register", uploadUserImage.single("image"), isLoggedOu
 
 userRouter.post("/activate", isLoggedOut, activateUseAccount)
 
-userRouter.get("/", isLoggedIn, isAdmin, getAllUser)
+userRouter.get("/", isLoggedIn, isAdmin, getAllUser);
 
 userRouter.put("/manage-user/:id", isLoggedIn, isAdmin, manageUserStatusById)
 

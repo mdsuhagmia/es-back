@@ -20,9 +20,8 @@ const rateLimiter = rateLimite({
 });
 
 app.use(cors({
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
+  origin: true,
+  credentials: true
 }));
 
 app.use(cookieParser());
