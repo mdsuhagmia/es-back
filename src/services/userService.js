@@ -92,16 +92,18 @@ const forgotUserPassword = async (email, origin) => {
 
     const token = createJsonWebToken({ email }, jwtResetPasswordKey, "10m");
 
+    const frontendUrl = origin || clientUrl;
+
     const emailData = {
       email,
       subject: "Reset password Email",
       html: `
             <h2>Hello ${userData.name}</h2>
-            <p>Please click here to <a href="${origin}/api/user/resetpassword/${token}" target="_blank">Reset your password</a></p>
+            <p>Please click here to <a href="${frontendUrl}/resetpassword/${token}" target="_blank">Reset your password</a></p>
           `,
     };
 
-    emailWithNodeMailer(emailData);
+    await emailWithNodeMailer(emailData);
     return token;
   } catch (error) {
     throw error;
