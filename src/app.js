@@ -12,6 +12,7 @@ const categoryRouter = require("./routes/categoryRoutes");
 const productRouter = require("./routes/productRoutes");
 const app = express();
 const cors = require('cors');
+const orderRouter = require("./routes/orderRoute");
 
 const rateLimiter = rateLimite({
     windowMs: 1 * 60 * 1000, // one minutes
@@ -36,6 +37,7 @@ app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/products", productRouter);
+app.use("/api/order", orderRouter);
 
 // home route
 app.get("/", (req, res)=>{
