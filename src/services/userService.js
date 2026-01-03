@@ -92,12 +92,14 @@ const forgotUserPassword = async (email) => {
 
     const token = createJsonWebToken({ email }, jwtResetPasswordKey, "10m");
 
+    const origin = req.headers.origin;
+
     const emailData = {
       email,
       subject: "Reset password Email",
       html: `
             <h2>Hello ${userData.name}</h2>
-            <p>Please click here to <a href="${clientUrl}/api/user/reset-password/${token}" target="_blank">Reset your password</a></p>
+            <p>Please click here to <a href="${origin}/resetpassword/${token}" target="_blank">Reset your password</a></p>
           `,
     };
 
