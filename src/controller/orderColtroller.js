@@ -67,6 +67,10 @@ const updateOrderStatus = async (req, res, next) => {
       { new: true }
     );
 
+    if (!updatedOrder) {
+      throw createError(404, "Order not found with this ID");
+    }
+
     res.status(200).json({
       success: true,
       message: "Order status updated",
