@@ -80,7 +80,7 @@ const updateUserPasswordById = async (
   }
 };
 
-const forgotUserPassword = async (email) => {
+const forgotUserPassword = async (email, origin) => {
   try {
     const userData = await User.findOne({ email: email });
     if (!userData) {
@@ -92,14 +92,12 @@ const forgotUserPassword = async (email) => {
 
     const token = createJsonWebToken({ email }, jwtResetPasswordKey, "10m");
 
-    const origin = req.headers.origin;
-
     const emailData = {
       email,
       subject: "Reset password Email",
       html: `
             <h2>Hello ${userData.name}</h2>
-            <p>Please click here to <a href="${origin}/resetpassword/${token}" target="_blank">Reset your password</a></p>
+            <p>Please click here to <a href="${origin}/api/user/resetpassword/${token}" target="_blank">Reset your password</a></p>
           `,
     };
 

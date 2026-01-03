@@ -342,9 +342,11 @@ const updateUserPassword = async (req, res, next) => {
 
 const updateUserForgotPassword = async (req, res, next) => {
   try {
+    
+    const origin = req.headers.origin;
     const { email } = req.body;
 
-    const token = await forgotUserPassword(email);
+    const token = await forgotUserPassword(email, origin);
 
     return successResponse(res, {
       statusCode: 200,
