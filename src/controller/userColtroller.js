@@ -167,18 +167,32 @@ const processRegister = async (req, res, next) => {
       `,
     };
 
+    // try {
+    //   await emailWithNodeMailer(emailData);
+    // } catch (error) {
+    //   next(createError(500, "Failed to send verification email"));
+    //   return;
+    // }
+
+    // return successResponse(res, {
+    //   statusCode: 200,
+    //   message: `Please go to your ${email} for complete registration process`,
+    //   payload: { token },
+    // });
     try {
       await emailWithNodeMailer(emailData);
-    } catch (error) {
-      next(createError(500, "Failed to send verification email"));
-      return;
-    }
+      
+      // সফল হলে এখানে রেসপন্স দিন
+      return successResponse(res, {
+        statusCode: 200,
+        message: `Please check your email: ${email} to complete registration.`,
+        payload: { token },
+      });
 
-    return successResponse(res, {
-      statusCode: 200,
-      message: `Please go to your ${email} for complete registration process`,
-      payload: { token },
-    });
+    } catch (emailError) {
+      console.error("Nodemailer Error:", emailError); // এটি আপনার সার্ভার টার্মিনালে এরর দেখাবে
+      return next(createError(500, "Could not send activation email. Please check your SMTP settings."));
+    }
   } catch (error) {
     next(error);
   }
